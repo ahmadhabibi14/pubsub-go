@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  redis:
+    image: redis
+    container_name: pubsubgo-redis
+    ports:
+      - 6379:6379
+    volumes:
+      - ./_docker-data/redis:/data
+    networks:
+      - pubsubgo-network
+
+networks:
+  pubsubgo-network:
