@@ -1,49 +1,54 @@
 package main
 
 import (
-	"context"
+	"fmt"
 	"log"
 	"pub-sub-go/configs"
-	"strconv"
+	"pub-sub-go/controller"
+	"time"
 
-	"github.com/redis/go-redis/v9"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/template/html/v2"
 )
 
-var RDS *redis.Client
-var CTX context.Context
-
-func init() {
-	CTX = context.Background()
-	RDS = configs.NewRedisClient()
-}
+const APP_NAME = `Notification System from Redis Pub/Sub`
 
 func main() {
+	configs.InitRedisClient()
 
-	_, err := RDS.Ping(CTX).Result()
+	err := configs.RDS.Ping(configs.RDS_CTX).Err()
 	if err != nil {
 		log.Println(`failed to connect redis`)
 		panic(err)
 	}
 
-	publish()
+	go publishNotification()
 
-	pubSub := RDS.Subscribe(CTX, `channel-1`)
-	defer pubSub.Close()
-	for i := 0; i < 10; i++ {
-		msg, err := pubSub.ReceiveMessage(CTX)
-		if err != nil {
-			log.Println(`pubSub.ReceiveMessage(CTX)`, err)
-		} else {
-			log.Println(`message:`, msg.Payload)
-		}
-	}
+	engine := html.New(`./views`, `.html`)
+	app := fiber.New(fiber.Config{
+		AppName: APP_NAME,
+		Views: engine,
+	})
+	app.Get(`/`, func(c *fiber.Ctx) error {
+		return c.Render(`index`, fiber.Map{
+			`title`: APP_NAME,
+		})
+	})
+	app.Get(`/notification`, controller.Notification)
+
+	app.Listen(`:8080`)
 }
 
-func publish() {
-	for i := 0; i < 10; i++ {
-		err := RDS.Publish(CTX, `channel-1`, `Hello ` + strconv.Itoa(i)).Err()
-		if err != nil {
-			log.Println(`RDS.Publish()`, err)
+func publishNotification() {
+	var i int
+	for {
+		i++
+
+		msg := fmt.Sprintf("%d - The time is: '%v'", i, time.Now())
+		if err := configs.RDS.Publish(configs.RDS_CTX, configs.CH_REDIS_PREFIX+`notification`, msg).Err(); err != nil {
+			log.Println(`Error:`, err)
 		}
+
+		time.Sleep(2 * time.Second)
 	}
 }
