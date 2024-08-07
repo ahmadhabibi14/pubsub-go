@@ -6,7 +6,10 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-const CH_REDIS_PREFIX = `channel:`
+const (
+	REDIS_CHANNEL_PREFIX = `channel:`
+	REDIS_CHANNEL_NOTIFICATION = REDIS_CHANNEL_PREFIX+`notification`
+)
 
 var RDS *redis.Client
 var RDS_CTX context.Context

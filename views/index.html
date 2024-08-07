@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ .title }}</title>
 </head>
 <body>
-  <h1>Notification</h1>
+  <h1>Notifikasi</h1>
   <div id="result">
     
   </div>
@@ -15,10 +15,10 @@
     if (typeof(EventSource) !== "undefined") {
       const source = new EventSource("http://localhost:8080/notification");
       source.onmessage = function(event) {
-        document.getElementById("result").innerHTML += event.data + "<br />";
+        document.getElementById("result").innerHTML += `<p style="margin: 0">` + event.data + `</p>`;
       };
     } else {
-      document.getElementById("result").innerHTML = "Sorry, your browser does not support SSE.";
+      document.getElementById("result").innerHTML = "Maaf, browser anda tidak mendukung SSE.";
     }
   </script>
 </body>
