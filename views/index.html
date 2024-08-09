@@ -13,7 +13,7 @@
 
   <script>
     if (typeof(EventSource) !== "undefined") {
-      const source = new EventSource("http://localhost:8080/notification");
+      const source = new EventSource("/notification");
       source.onmessage = function(event) {
         document.getElementById("result").innerHTML += `<p style="margin: 0">` + event.data + `</p>`;
       };

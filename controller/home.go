@@ -21,7 +21,5 @@ func HomePage(c *fiber.Ctx) error {
 		log.Println(`Error:`, err)
 	}
 
-	return c.Render(`index`, fiber.Map{
-		`title`: `Sistem notifikasi dengan Redis Pub/Sub`,
-	})
+	return c.Render(`index`, fiber.Map{})
 }
